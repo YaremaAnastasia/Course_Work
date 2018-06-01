@@ -25,52 +25,52 @@ int bfactor(node* tree)
 	return height(tree->right) - height(tree->left);
 }
 
-void fixheight(node* tree)
+void fixHeight(node* tree)
 {
 	unsigned char heightleft = height(tree->left);
 	unsigned char heightright = height(tree->right);
 	tree->height = (heightleft>heightright ? heightleft : heightright) + 1;
 }
 
-node* rotateright(node* tree) // правый поворот вокруг p
+node* rotateRight(node* tree)
 {
 	node* otree = tree->left;
 	tree->left = otree->right;
 	otree->right = tree;
-	fixheight(tree);
-	fixheight(otree);
+	fixHeight(tree);
+	fixHeight(otree);
 	return otree;
 }
 
-node* rotateleft(node* otree) // левый поворот вокруг otree
+node* rotateLeft(node* otree) 
 {
 	node* tree = otree->right;
 	otree->right = tree->left;
 	tree->left = otree;
-	fixheight(otree);
-	fixheight(tree);
+	fixHeight(otree);
+	fixHeight(tree);
 	return tree;
 }
 
-node* balance(node* tree) // балансировка узла p
+node* balance(node* tree) 
 {
-	fixheight(tree);
+	fixHeight(tree);
 	if (bfactor(tree) == 2)
 	{
 		if (bfactor(tree->right) < 0)
-			tree->right = rotateright(tree->right);
-		return rotateleft(tree);
+			tree->right = rotateRight(tree->right);
+		return rotateLeft(tree);
 	}
 	if (bfactor(tree) == -2)
 	{
 		if (bfactor(tree->left) > 0)
-			tree->left = rotateleft(tree->left);
-		return rotateright(tree);
+			tree->left = rotateLeft(tree->left);
+		return rotateRight(tree);
 	}
 	return tree; // балансировка не нужна
 }
 
-node* insert(node* tree, int key) // вставка ключа key в дерево с корнем p
+node* insert(node* tree, int key) // вставка ключа key в дерево с корнем tree
 {
 	if (!tree) return new node(key);
 	if (key<tree->key)
@@ -80,41 +80,42 @@ node* insert(node* tree, int key) // вставка ключа key в дерев
 	return balance(tree);
 }
 
-node* findmin(node* tree) // поиск узла с минимальным ключом в дереве p 
+node* findMin(node* tree) 
 {
-	return tree->left ? findmin(tree->left) : tree;
+	return tree->left ? findMin(tree->left) : tree;
 }
 
-node* removemin(node* tree) // удаление узла с минимальным ключом из дерева p
+node* removeMin(node* tree) // удаление узла с минимальным ключом из дерева tree
 {
 	if (tree->left == 0)
 		return tree->right;
-	tree->left = removemin(tree->left);
+	tree->left = removeMin(tree->left);
 	return balance(tree);
 }
 
-node* remove(node* tree, int key) // удаление ключа key из дерева p
+node* remove(node* tree, int key) // удаление ключа key из дерева tree
 {
 	if (!tree) return 0;
 	if (key < tree->key)
 		tree->left = remove(tree->left, key);
 	else if (key > tree->key)
 		tree->right = remove(tree->right, key);
-	else //  key == p->key 
+	else 
 	{
 		node* otree = tree->left;
 		node* rtree = tree->right;
 		delete tree;
 		if (!rtree) return otree;
-		node* min = findmin(rtree);
-		min->right = removemin(rtree);
+		node* min = findMin(rtree);
+		min->right = removeMin(rtree);
 		min->left = otree;
 		return balance(min);
 	}
 	return balance(tree);
 }
 
-void print_tree(node **root) {
+void print_tree(node **root) 
+{
 	if (*root != nullptr) {
 		cout << (*root)->key << endl;
 		print_tree(&(*root)->left);
